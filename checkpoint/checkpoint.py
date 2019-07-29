@@ -13,6 +13,11 @@ class Checkpoint(object):
         '''
         Class to save/load checkpoint/state_dict.
         :param result_path: Path to save each experiment model、state_dict、parameters etc.
+               -- checkpoint -- checkpoint.pth
+              |
+        result -- model -- state_dict.pth
+              |
+               -- code -- net
         '''
         self.model_path = os.path.join(result_path, 'model')
         self.checkpoint_path = os.path.join(result_path, 'checkpoint')

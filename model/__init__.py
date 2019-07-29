@@ -1,4 +1,4 @@
 # author: LiuZhQ
 # time  : 2019/7/20
 
-from recorder.recorder import Recorder
+from model.model import Model
