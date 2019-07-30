@@ -8,7 +8,7 @@ import torch.optim as optim
 from tqdm import tqdm
 
 from checkpoint import Checkpoint
-from option import Option
+from option import Option, Arguments
 from recorder import Recorder
 from model import Model
 from data import Data
@@ -21,13 +21,16 @@ class Trainer(object):
         self._init_object()
         self._init_device()
         self.recorder.record_file()  # Save needed codes
-        self.recorder.write_opt(self.opts.get_all_opts())  # Save experiment arguments
+        self.recorder.write_opt(self.opts)  # Save experiment arguments
+        self.best_result = {'epoch': 0, 'accuracy': 0.}  # Initialize best result
 
-        # ## Network ## Criterion ## Optimizer ## DataLoader ##
+        # ## Network ## Criterion ## Optimizer ## Scheduler ## DataLoader ##
         self.net = self.model.get_model().to(self.device)
         self.criterion = nn.CrossEntropyLoss().to(self.device)
         self.optimizer = optim.SGD(self.net.parameters(), lr=self.opts.lr, momentum=self.opts.momentum,
                                    weight_decay=self.opts.weight_decay)
+        self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.opts.step_size,
+                                                   gamma=self.opts.gamma)
         self.train_loader = self.data.get_train_loader()
         self.test_loader = self.data.get_test_loader()
         # ## Network ## Criterion ## Optimizer ## DataLoader ##
@@ -36,14 +39,9 @@ class Trainer(object):
         if self.opts.resume_path:
             self._resume()
 
-        # LR scheduler
-        self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=self.opts.step_size,
-                                                   gamma=self.opts.gamma, last_epoch=self.opts.begin_epoch - 2)
-
-        self.best_result = {'epoch': 1, 'accuracy': 0.}
-
     def _init_object(self):
         self.opts = Option()
+        # self.opts = Arguments().get_args()
         self.ckp = Checkpoint(self.opts.result_path)
         self.recorder = Recorder(self.opts.root_path, self.opts.result_path)
         self.model = Model(self.opts)
@@ -60,12 +58,13 @@ class Trainer(object):
         Load checkpoint to resume training.
         :return:
         '''
-        model_state_dict, optimizer_state_dict, epoch, best_result = self.ckp.load_checkpoint(
-            self.opts.resume_path)
-        self.opts.begin_epoch = epoch + 1
-        self.best_result = best_result
+        model_state_dict, optimizer_state_dict, scheduler_state_dict, epoch, best_result = \
+            self.ckp.load_checkpoint(self.opts.resume_path)
         self.net.load_state_dict(model_state_dict)
         self.optimizer.load_state_dict(optimizer_state_dict)
+        self.scheduler.load_state_dict(scheduler_state_dict)
+        self.opts.begin_epoch = epoch + 1
+        self.best_result = best_result
 
     def train(self):
         '''
@@ -86,7 +85,7 @@ class Trainer(object):
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
             data_time.update(time.time() - start_data_time)
-            
+
             # Compute output and loss
             outputs = self.net(inputs)
             loss = self.criterion(outputs, labels)
@@ -100,7 +99,7 @@ class Trainer(object):
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
-            
+
             # Measure elapsed time
             batch_time.update(time.time() - start_batch_time)
             start_batch_time = time.time()
@@ -119,7 +118,7 @@ class Trainer(object):
                     data_time.val, data_time.sum
                 ))
             start_data_time = time.time()
-        return train_accuracy.val, train_loss.val
+        return train_accuracy.avg, train_loss.avg
 
     def test(self):
         '''
@@ -127,7 +126,7 @@ class Trainer(object):
         :return:
         '''
         epoch = self.scheduler.last_epoch + 1
-        print('==> Start Validatiing epoch {} ...'.format(epoch))
+        print('==> Start Validating epoch {} ...'.format(epoch))
         self.net.eval()
         val_loss = AverageMeter()
         val_accuracy = AverageMeter()
@@ -164,24 +163,29 @@ class Trainer(object):
             self.net.load_state_dict(state_dict)
             self.test()
         else:
-            for epoch in range(self.opts.begin_epoch, self.opts.epochs + 1):
+            for epoch in range(self.opts.begin_epoch, self.opts.epochs):
                 epoch_time = time.time()
                 self.scheduler.step()
                 train_accuracy, train_loss = self.train()
                 test_accuracy, test_loss = self.test()
-                save_text = [{'epoch': epoch,
+                # save experiment's result to csv
+                save_text = [{'epoch': epoch + 1, 'lr': self.optimizer.param_groups[0]['lr'],
                               'train_accuracy': train_accuracy, 'test_accuracy': test_accuracy,
                               'train_loss': train_loss, 'test_loss': test_loss}]
+                log_data = [train_accuracy, test_accuracy, train_loss, test_loss]
                 self.recorder.log_csv(save_text)
+                self.recorder.add_log(log_data)
+                self.recorder.plt_all()
+                # if
                 if test_accuracy >= self.best_result['accuracy']:
-                    print('==> save best result ...')
                     self.ckp.save_state_dict(self.net, self.opts.model_name, best_flag=True)
                     self.best_result['epoch'] = epoch
                     self.best_result['accuracy'] = test_accuracy
-                if epoch % self.opts.checkpoint_interval == 0:
-                    self.ckp.save_checkpoint(self.net, self.optimizer, epoch, self.best_result)
+                if (epoch + 1) % self.opts.checkpoint_interval == 0:
+                    self.ckp.save_checkpoint(self.net, self.optimizer, self.scheduler,
+                                             epoch, self.best_result)
                 epoch_time = time.time() - epoch_time
-                print('==> Epoch{} cost {}m {}s'.format(epoch, epoch_time // 60, epoch % 60))
+                print('==> Epoch{} cost {}m {}s'.format(epoch + 1, epoch_time // 60, epoch % 60))
         total_time = time.time() - total_time
         hour = total_time // 3600
         min = (total_time % 3600) // 60

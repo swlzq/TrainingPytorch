@@ -31,10 +31,6 @@ class DRIVER(Dataset):
         self.transform = None
         self.size = []
 
-        # # Set seed manually so that we can restore same result
-        # seed = 7777
-        # random.seed(seed)
-
         # Read label csv and get all drivers
         csv_path = os.path.join(self.data_path, 'driver_images_list.csv')
         data_frame = pd.read_csv(csv_path)
@@ -46,21 +42,13 @@ class DRIVER(Dataset):
             labels = drivers_labels[:-len_validate]  # train set
         else:
             labels = drivers_labels[-len_validate:]  # validate set
-        # print(labels)
-        # validate_drivers = ['p012', 'p022', 'p045', 'p047']
-        # train_drivers = [driver for driver in drivers_labels if driver not in validate_drivers]
-        # labels = train_drivers if self.train else validate_drivers
 
-        total_len = 0
         for label in labels:
             df = data_frame[(data_frame['subject'] == label)]
-            total_len += len(df)
-            print(label, len(df))
             for _, row in df.iterrows():
                 self.drivers.append(row['subject'])
                 self.images.append(row['img'])
                 self.targets.append(row['classname'])
-        print(total_len)
 
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         if self.train:
@@ -90,17 +78,6 @@ class DRIVER(Dataset):
         image = self.transform(image)
         target = int(target[-1:])
         return image, target
-
-
-def data_loader(data_path, batch_size=128, num_workers=4, input_size=224, train=True):
-    dataset = DRIVER(data_path=data_path, input_size=input_size, train=train)
-    dataloader = DataLoader(
-        dataset=dataset,
-        batch_size=batch_size,
-        shuffle=train,
-        num_workers=num_workers
-    )
-    return dataloader
 
 
 # divide different drivers images into different directions

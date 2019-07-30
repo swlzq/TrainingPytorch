@@ -4,6 +4,8 @@
 import os
 import shutil
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 __all__ = ['Recorder']
 
@@ -18,6 +20,10 @@ class Recorder(object):
 
         # File or directory list to record
         self.record_file_list = ['model', 'option']
+
+        # Experiment data for plotting[[train_acc][test_acc][train_loss][test_acc]]
+        self.log_data = [[] for _ in range(4)]
+        self.log_label = ['train_acc', 'test_acc', 'train_loss', 'test_loss']
 
         if not os.path.exists(self.code_path):
             os.makedirs(self.code_path)
@@ -35,6 +41,7 @@ class Recorder(object):
                 assert False, '{} not existed.'.format(file)
 
     def write_opt(self, opts):
+        opts = vars(opts)
         with open(self.opt_file, 'w') as f:
             for k, v in opts.items():
                 f.write(str(k) + ": " + str(v) + '\n')
@@ -64,11 +71,42 @@ class Recorder(object):
         with open(path, open_mode) as f:
             f.write(data + '\n')
 
+    def add_log(self, data):
+        for idx in range(len(self.log_data)):
+            self.log_data[idx].append(data[idx])
+
+    def plt_all(self):
+        self.plt(self.log_data[:2], self.log_label[:2], 'epochs', 'accuracy')
+        self.plt(self.log_data[2:], self.log_label[2:], 'epochs', 'loss')
+
+    def plt(self, data, label, xlabel, ylabel):
+        assert isinstance(data, list), 'data must be list'
+        axis = np.arange(1, len(data[0]) + 1)
+        fig = plt.figure()
+        plt.title('Train and test {}'.format(ylabel))
+        for idx, data in enumerate(data):
+            plt.plot(
+                axis,
+                data,
+                label=label[idx]
+            )
+        plt.legend(loc=1)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.grid(True)
+        savefig_path = os.path.join(self.result_path, 'experiment_{}.png'.format(ylabel))
+        plt.savefig(savefig_path)
+        plt.close(fig)
+
 
 if __name__ == '__main__':
-    recorder = Recorder(root_path='../', result_path='../results')
-    recorder.record_file()
-    recorder.log_csv([{'acc': 0., 'loss': 0.}])
-    recorder.log_csv([{'acc': 0., 'loss': 0.}])
-    recorder.log_txt('test', 'log')
-    recorder.log_txt('test2', 'log')
+    recorder = Recorder(root_path='../', result_path='../result')
+    # recorder.record_file()
+    # recorder.log_csv([{'acc': 0., 'loss': 0.}])
+    # recorder.log_csv([{'acc': 0., 'loss': 0.}])
+    # recorder.log_txt('test', 'log')
+    # recorder.log_txt('test2', 'log')
+    for i in range(20):
+        recorder.add_log([1, 2, .3, .4])
+        recorder.add_log([4, 5, .6, .7])
+    recorder.plt_all()
