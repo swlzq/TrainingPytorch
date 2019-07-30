@@ -28,7 +28,7 @@ class Checkpoint(object):
         if not os.path.exists(self.checkpoint_path):
             os.makedirs(self.checkpoint_path)
 
-    def save_checkpoint(self, model, optimizer, epoch, best_result):
+    def save_checkpoint(self, model, optimizer, scheduler, epoch, best_result):
         '''
         :param model: Network model.
         :param optimizer: Optimizer.
@@ -36,16 +36,18 @@ class Checkpoint(object):
         :param best_result: Current lowest loss or highest accuracy etc.
         :return:
         '''
+        print('==> Save checkpoint ...')
         if isinstance(model, nn.DataParallel):
             model = model.module
 
         self.checkpoint_params['model'] = model.state_dict()
         self.checkpoint_params['optimizer'] = optimizer.state_dict()
+        self.checkpoint_params['scheduler'] = scheduler.state_dict()
         self.checkpoint_params['epoch'] = epoch
         self.checkpoint_params['best_result'] = best_result
 
         torch.save(self.checkpoint_params,
-                   os.path.join(self.checkpoint_path, 'checkpoint_{:03d}.pth'.format(epoch)))
+                   os.path.join(self.checkpoint_path, 'checkpoint_{:03d}.pth'.format(epoch + 1)))
 
     def save_state_dict(self, model, save_name='model', best_flag=False):
         '''
@@ -54,6 +56,10 @@ class Checkpoint(object):
         :param best_flag: Distinguish if state_dict is best or not.
         :return:
         '''
+        if best_flag:
+            print('==> Save best model ...')
+        else:
+            print('==> Save model ...')
         if isinstance(model, nn.DataParallel):
             model = model.module
         state_dict = model.state_dict()
@@ -67,9 +73,10 @@ class Checkpoint(object):
             self.checkpoint_params = torch.load(checkpoint_file)
             model_state_dict = self.checkpoint_params['model']
             optimizer_state_dict = self.checkpoint_params['optimizer']
+            scheduler_state_dict = self.checkpoint_params['scheduler']
             epoch = self.checkpoint_params['epoch']
             best_result = self.checkpoint_params['best_result']
-            return model_state_dict, optimizer_state_dict, epoch, best_result
+            return model_state_dict, optimizer_state_dict, scheduler_state_dict, epoch, best_result
         else:
             assert False, 'File not exists: {}'.format(checkpoint_file)
 
