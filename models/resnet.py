@@ -122,7 +122,7 @@ class ResNet(nn.Module):
 
         # Zero-initialize the last BN in each residual branch,
         # so that the residual branch starts with zeros, and each residual block behaves like an identity.
-        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
+        # This improves the models by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
         if zero_init_residual:
             for m in self.modules():
                 if isinstance(m, Bottleneck):
@@ -166,10 +166,10 @@ class ResNet(nn.Module):
 
 def resnet18(pretrained=False, model_dir=None, **kwargs):
     print(kwargs)
-    """Constructs a ResNet-18 model.
+    """Constructs a ResNet-18 models.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a models pre-trained on ImageNet
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     if pretrained:
@@ -178,10 +178,10 @@ def resnet18(pretrained=False, model_dir=None, **kwargs):
 
 
 def resnet34(pretrained=False, model_dir=None, **kwargs):
-    """Constructs a ResNet-34 model.
+    """Constructs a ResNet-34 models.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a models pre-trained on ImageNet
     """
     model = ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
     if pretrained:
@@ -190,10 +190,10 @@ def resnet34(pretrained=False, model_dir=None, **kwargs):
 
 
 def resnet50(pretrained=False, model_dir=None, **kwargs):
-    """Constructs a ResNet-50 model.
+    """Constructs a ResNet-50 models.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a models pre-trained on ImageNet
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
@@ -202,10 +202,10 @@ def resnet50(pretrained=False, model_dir=None, **kwargs):
 
 
 def resnet101(pretrained=False, model_dir=None, **kwargs):
-    """Constructs a ResNet-101 model.
+    """Constructs a ResNet-101 models.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a models pre-trained on ImageNet
     """
     model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
     if pretrained:
@@ -214,10 +214,10 @@ def resnet101(pretrained=False, model_dir=None, **kwargs):
 
 
 def resnet152(pretrained=False, model_dir=None, **kwargs):
-    """Constructs a ResNet-152 model.
+    """Constructs a ResNet-152 models.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a models pre-trained on ImageNet
     """
     model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
     if pretrained:

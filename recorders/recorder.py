@@ -15,13 +15,13 @@ class Recorder(object):
         self.root_path = root_path  # project's root path
         self.result_path = result_path  # experiment result's root path
         self.code_path = os.path.join(self.result_path, 'code')  # saved code path
-        self.opt_file = os.path.join(self.code_path, 'opt.txt')  # saved option argument path
+        self.opt_file = os.path.join(self.code_path, 'opt.txt')  # saved options argument path
         self.experiment_file = os.path.join(self.result_path, 'experiment.csv')  # save training results
 
         # File or directory list to record
-        self.record_file_list = ['model', 'option']
+        self.record_file_list = ['models', 'options']
 
-        # Experiment data for plotting[[train_acc][test_acc][train_loss][test_acc]]
+        # Experiment dataset for plotting[[train_acc][test_acc][train_loss][test_acc]]
         self.log_data = [[] for _ in range(4)]
         self.log_label = ['train_acc', 'test_acc', 'train_loss', 'test_loss']
 
@@ -48,10 +48,10 @@ class Recorder(object):
 
     def log_csv(self, data):
         '''
-        :param data: training data, eg. [{acc:0, loss:0}]
+        :param data: training dataset, eg. [{acc:0, loss:0}]
         '''
         #
-        assert isinstance(data, list), 'data must be a list'
+        assert isinstance(data, list), 'dataset must be a list'
         df = pd.DataFrame(data)
         if not os.path.isfile(self.experiment_file):
             df.to_csv(self.experiment_file, index=False)
@@ -61,7 +61,7 @@ class Recorder(object):
     def log_txt(self, data, log_name):
         '''
 
-        :param data: log data
+        :param data: log dataset
         :param log_name: log file's name
         '''
         #
@@ -80,7 +80,7 @@ class Recorder(object):
         self.plt(self.log_data[2:], self.log_label[2:], 'epochs', 'loss')
 
     def plt(self, data, label, xlabel, ylabel):
-        assert isinstance(data, list), 'data must be list'
+        assert isinstance(data, list), 'dataset must be list'
         axis = np.arange(1, len(data[0]) + 1)
         fig = plt.figure()
         plt.title('Train and test {}'.format(ylabel))
@@ -101,11 +101,11 @@ class Recorder(object):
 
 if __name__ == '__main__':
     recorder = Recorder(root_path='../', result_path='../result')
-    # recorder.record_file()
-    # recorder.log_csv([{'acc': 0., 'loss': 0.}])
-    # recorder.log_csv([{'acc': 0., 'loss': 0.}])
-    # recorder.log_txt('test', 'log')
-    # recorder.log_txt('test2', 'log')
+    # recorders.record_file()
+    # recorders.log_csv([{'acc': 0., 'loss': 0.}])
+    # recorders.log_csv([{'acc': 0., 'loss': 0.}])
+    # recorders.log_txt('test', 'log')
+    # recorders.log_txt('test2', 'log')
     for i in range(20):
         recorder.add_log([1, 2, .3, .4])
         recorder.add_log([4, 5, .6, .7])

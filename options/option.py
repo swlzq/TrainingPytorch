@@ -12,18 +12,18 @@ class Option(object):
         # ==================== Initialize directory path ====================
         self.root_path = 'F:/project_python/TrainingPytorch'  # Project root directory path
         self.data_path = 'F:/dataset/state-farm-distracted-driver-detection'  # Dataset root directory path
-        self.result_path = 'result'  # Result root directory path
-        self.pretrained_model_path = 'pretrained_model'  # Path to store previous trained models
+        self.result_path = 'results'  # Result root directory path
+        self.pretrained_model_path = 'pretrained_models'  # Path to store previous trained models
         self.resume_path = ''  # Checkpoint path to resume training
-        self.test_path = ''  # Test model path
+        self.test_path = ''  # Test models path
         # ==================== Initialize directory path ====================
 
-        # ==================== Initialize model setting ====================
+        # ==================== Initialize models setting ====================
         self.model_name = 'resnet18'  # Model name
         self.input_size = 224  # Model's input size
         self.num_classes = 10  # For classification task
         self.use_cuda = True  # Use cuda or cpu
-        # ==================== Initialize model setting ====================
+        # ==================== Initialize models setting ====================
 
         # ==================== Initialize optimizer setting ====================
         self.lr = 0.001  # Number of learning rate
@@ -48,7 +48,7 @@ class Option(object):
         self.begin_epoch = 0  # Number of beginning training epoch
         self.epochs = 20  # Number of total training epochs
         self.log_interval = 20  # Number of logging training status interval
-        self.checkpoint_interval = 5  # Number of save checkpoint interval
+        self.checkpoint_interval = 5  # Number of save checkpoints interval
         # ==================== Initialize training setting ====================
 
         self._init_file_settting()
@@ -62,7 +62,7 @@ class Option(object):
         assert not os.path.exists(self.result_path), '{} has existed.'.format(self.result_path)
         os.makedirs(self.result_path)
 
-        # Create pretrained model directory
+        # Create pretrained models directory
         self.pretrained_model_path = os.path.join(self.root_path, self.pretrained_model_path)
         if not os.path.exists(self.pretrained_model_path):
             os.makedirs(self.pretrained_model_path)

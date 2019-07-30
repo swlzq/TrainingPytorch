@@ -7,11 +7,11 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
-from checkpoint import Checkpoint
-from option import Option, Arguments
-from recorder import Recorder
-from model import Model
-from data import Data
+from checkpoints import Checkpoint
+from options import Option, Arguments
+from recorders import Recorder
+from models import Model
+from dataset import Data
 from utils import AverageMeter, calculate_accuracy
 
 
@@ -55,7 +55,7 @@ class Trainer(object):
 
     def _resume(self):
         '''
-        Load checkpoint to resume training.
+        Load checkpoints to resume training.
         :return:
         '''
         model_state_dict, optimizer_state_dict, scheduler_state_dict, epoch, best_result = \

@@ -15,26 +15,26 @@ class Arguments(object):
                                  type=str, help='Project root directory path')
         self.parser.add_argument('--data_path', default='F:/dataset/state-farm-distracted-driver-detection',
                                  type=str, help='Dataset root directory path')
-        self.parser.add_argument('--result_path', default='result',
+        self.parser.add_argument('--result_path', default='results',
                                  type=str, help='Result root directory path')
-        self.parser.add_argument('--pretrained_model_path', default='pretrained_model',
+        self.parser.add_argument('--pretrained_model_path', default='pretrained_models',
                                  type=str, help='Path to store previous trained models')
         self.parser.add_argument('--resume_path', default='',
                                  type=str, help='Checkpoint path to resume training')
         self.parser.add_argument('--test_path', default='',
-                                 type=str, help='Test model path')
+                                 type=str, help='Test models path')
         # ==================== Initialize directory path ====================
 
-        # ==================== Initialize model setting ====================
+        # ==================== Initialize models setting ====================
         self.parser.add_argument('--model_name', default='resnet18',
                                  type=str, help='Model name')
         self.parser.add_argument('--input_size', default=224,
-                                 type=int, help='Input size of model')
+                                 type=int, help='Input size of models')
         self.parser.add_argument('--num_classes', default=10,
                                  type=int, help='For classification task')
         self.parser.add_argument('--use_cuda', action='store_true',
                                  help='If False use cpu else cuda')
-        # ==================== Initialize model setting ====================
+        # ==================== Initialize models setting ====================
 
         # ==================== Initialize optimizer setting ====================
         self.parser.add_argument('--lr', default=0.001,
@@ -76,7 +76,7 @@ class Arguments(object):
         self.parser.add_argument('--log_interval', default=20,
                                  type=int, help='Number of logging training status interval')
         self.parser.add_argument('--checkpoint_interval', default=5,
-                                 type=int, help='Number of save checkpoint interval')
+                                 type=int, help='Number of save checkpoints interval')
         # ==================== Initialize training setting ====================
         self.args = self.parser.parse_args()
 
@@ -92,7 +92,7 @@ class Arguments(object):
         assert not os.path.exists(self.args.result_path), '{} has existed.'.format(self.result_path)
         os.makedirs(self.args.result_path)
 
-        # Create pretrained model directory
+        # Create pretrained models directory
         self.args.pretrained_model_path = os.path.join(self.args.root_path, self.args.pretrained_model_path)
         if not os.path.exists(self.args.pretrained_model_path):
             os.makedirs(self.args.pretrained_model_path)

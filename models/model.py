@@ -5,8 +5,8 @@ import os
 import torch
 import torch.nn as nn
 
-import model.resnet as resnet
-from model.MobileNetV2 import MobileNetV2
+import models.resnet as resnet
+from models.MobileNetV2 import MobileNetV2
 
 __all__ = ['Model']
 
@@ -20,9 +20,9 @@ class Model(object):
 
     def get_model(self):
         if self.fine_tune:
-            print('==> Load pretrained model: {}'.format(self.model_name))
+            print('==> Load pretrained models: {}'.format(self.model_name))
         else:
-            print('==> Load model: {}'.format(self.model_name))
+            print('==> Load models: {}'.format(self.model_name))
 
         if self.model_name.startswith('resnet'):
             model = self._resnet()

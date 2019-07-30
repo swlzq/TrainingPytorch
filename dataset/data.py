@@ -9,7 +9,7 @@ class Data(object):
     def __init__(self, opts):
         if not opts.test_only:
             print('==> Load train dataset: {}'.format(opts.train_dataset))
-            module_train = import_module('data.' + opts.train_dataset.lower())
+            module_train = import_module('dataset.' + opts.train_dataset.lower())
             train_dataset = getattr(module_train, opts.train_dataset)(opts, train=True)
             self.train_loder = DataLoader(
                 dataset=train_dataset,
@@ -19,7 +19,7 @@ class Data(object):
                 pin_memory=opts.pin_memory
             )
         print('==> Load test dataset: {}'.format(opts.test_dataset))
-        module_test = import_module('data.' + opts.test_dataset.lower())
+        module_test = import_module('dataset.' + opts.test_dataset.lower())
         test_dataset = getattr(module_test, opts.test_dataset)(opts, train=False)
         self.test_loader = DataLoader(
             dataset=test_dataset,
