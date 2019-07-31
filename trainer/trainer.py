@@ -12,7 +12,7 @@ from options import Option, Arguments
 from recorders import Recorder
 from models import Model
 from dataset import Data
-from utils import AverageMeter, calculate_accuracy, set_seed
+from utils import AverageMeter, calculate_accuracy
 
 
 class Trainer(object):
