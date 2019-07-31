@@ -2,7 +2,7 @@
 # time  : 2019/7/29
 
 from importlib import import_module
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 
 
 class Data(object):

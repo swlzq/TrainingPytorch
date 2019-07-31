@@ -7,19 +7,18 @@ import csv
 import shutil
 import random
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from PIL import Image
 from torchvision import transforms
 
-__all__ = ['DRIVER', 'data_loader']
+__all__ = ['DRIVER']
 
 
 class DRIVER(Dataset):
     def __init__(self, opts, train=True):
         """
         Dataset is divided train set and val set by different drives.
-        :param data_path: dataset root path
-        :param input_size: image input size
+        :param opts: super arguments
         :param train: if true, load train set, else load validate set
         """
         self.data_path = opts.data_path
@@ -118,8 +117,3 @@ def create_label_file():
                 image_list = os.listdir(category_path)
                 for image in image_list:
                     writer.writerow([driver, category, image])
-
-
-if __name__ == '__main__':
-    data_loader('F:/PCL/IntelligentTransport/state-farm-distracted-driver-detection', train=False)
-    # create_label_file()

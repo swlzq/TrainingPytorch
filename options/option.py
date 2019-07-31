@@ -3,6 +3,9 @@
 
 import os
 import time
+import torch
+import random
+import numpy as np
 
 __all__ = ['Option']
 
@@ -43,6 +46,7 @@ class Option(object):
         # ==================== Initialize dataset setting ====================
 
         # ==================== Initialize training setting ====================
+        self.seed = 7777  # Ensure training can be reproduced
         self.fine_tune = False  # Fine tuning or train from scratch
         self.test_only = False  # If true, not training
         self.begin_epoch = 0  # Number of beginning training epoch
@@ -52,17 +56,23 @@ class Option(object):
         # ==================== Initialize training setting ====================
 
         self._init_file_settting()
+        self._set_seed()
 
     def _init_file_settting(self):
         # Each experiment has different flag to identity
         _date = time.strftime('%Y-%m-%d-%H%M%S', time.localtime(time.time()))
         self.flag = '_' + _date + '_'
         self.result_path = os.path.join(self.root_path, self.result_path, self.model_name + self.flag)
-
         assert not os.path.exists(self.result_path), '{} has existed.'.format(self.result_path)
-        os.makedirs(self.result_path)
-
         # Create pretrained models directory
         self.pretrained_model_path = os.path.join(self.root_path, self.pretrained_model_path)
         if not os.path.exists(self.pretrained_model_path):
             os.makedirs(self.pretrained_model_path)
+
+    def _set_seed(self):
+        random.seed(self.seed)
+        np.random.seed(self.seed)
+        torch.manual_seed(self.seed)
+        torch.cuda.manual_seed(self.seed)
+        torch.cuda.manual_seed_all(self.seed)
+        torch.backends.cudnn.deterministic = True

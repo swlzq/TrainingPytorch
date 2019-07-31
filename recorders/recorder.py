@@ -30,6 +30,7 @@ class Recorder(object):
 
     # record needed files
     def record_file(self):
+        print('==> Record needed files ...')
         for file in self.record_file_list:
             src_path = os.path.join(self.root_path, file)
             tag_path = os.path.join(self.code_path, file)
@@ -41,15 +42,16 @@ class Recorder(object):
                 assert False, '{} not existed.'.format(file)
 
     def write_opt(self, opts):
+        print('==> Save options ...')
         opts = vars(opts)
         with open(self.opt_file, 'w') as f:
             for k, v in opts.items():
                 f.write(str(k) + ": " + str(v) + '\n')
 
     def log_csv(self, data):
-        '''
+        """
         :param data: training dataset, eg. [{acc:0, loss:0}]
-        '''
+        """
         #
         assert isinstance(data, list), 'dataset must be a list'
         df = pd.DataFrame(data)
@@ -59,11 +61,10 @@ class Recorder(object):
             df.to_csv(self.experiment_file, mode='a', header=False, index=False)
 
     def log_txt(self, data, log_name):
-        '''
-
+        """
         :param data: log dataset
         :param log_name: log file's name
-        '''
+        """
         #
         name = log_name + '.txt'
         path = os.path.join(self.result_path, name)
@@ -97,16 +98,3 @@ class Recorder(object):
         savefig_path = os.path.join(self.result_path, 'experiment_{}.png'.format(ylabel))
         plt.savefig(savefig_path)
         plt.close(fig)
-
-
-if __name__ == '__main__':
-    recorder = Recorder(root_path='../', result_path='../result')
-    # recorders.record_file()
-    # recorders.log_csv([{'acc': 0., 'loss': 0.}])
-    # recorders.log_csv([{'acc': 0., 'loss': 0.}])
-    # recorders.log_txt('test', 'log')
-    # recorders.log_txt('test2', 'log')
-    for i in range(20):
-        recorder.add_log([1, 2, .3, .4])
-        recorder.add_log([4, 5, .6, .7])
-    recorder.plt_all()
